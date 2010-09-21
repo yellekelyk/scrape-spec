@@ -49,3 +49,38 @@ proc.processFull <- function(proc) {
             )
 }
 
+proc.renameCol <- function(df, colName, newColName) {
+  colnames(df)[colnames(df)==colName] <- newColName;
+  invisible(df)
+}
+
+
+proc.tmp <- function() {
+
+  spec.int.2k6 <- proc.processFull(read.csv("/mnt/raid/research/stanford/procPerf/test.CINT2006_(2206).csv"))
+  spec.fp.2k6 <- proc.processFull(read.csv("/mnt/raid/research/stanford/procPerf/test.CFP2006_(2161).csv"))
+  specr.int.2k6 <- proc.processFull(read.csv("/mnt/raid/research/stanford/procPerf/test.CINT2006_Rates_(4189).csv"))
+  specr.fp.2k6 <- proc.processFull(read.csv("/mnt/raid/research/stanford/procPerf/test.CFP2006_Rates_(3682).csv"))
+
+
+  #proc.renameCol(spec.int.2k6, "basemean", "SpecInt2006Base")
+  #proc.renameCol(spec.int.2k6, "peakmean", "SpecInt2006Peak")
+  #proc.renameCol(spec.fp.2k6, "basemean",  "SpecFP2006Base")
+  #proc.renameCol(spec.fp.2k6, "peakmean",  "SpecFP2006Peak")
+  #
+  #proc.renameCol(specr.int.2k6, "basemean", "SpecInt2006RBase")
+  #proc.renameCol(specr.int.2k6, "peakmean", "SpecInt2006RPeak")
+  #proc.renameCol(specr.fp.2k6, "basemean",  "SpecFP2006RBase")
+  #proc.renameCol(specr.fp.2k6, "peakmean",  "SpecFP2006RPeak")
+
+  sameCols <- c("processor", "clock", "hw_nthreadspercore",
+                "hw_ncoresperchip", "hw_nchips", "hw_ncores")
+  
+  tmp <- merge(spec.int.2k6, spec.fp.2k6,
+               by=sameCols, all=TRUE, suffixes = c(".int2006", ".fp2006"))
+  tmpr <- merge(specr.int.2k6, specr.fp.2k6,
+               by=sameCols, all=TRUE, suffixes = c(".rate.int2006", ".rate.fp2006"))
+  tmp <- merge(tmp, tmpr, by=sameCols, all=TRUE)
+
+  invisible(tmp)
+}

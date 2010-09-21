@@ -1,6 +1,7 @@
 import BeautifulSoup
 import Spec2006Data
 import Spec2000Data
+import Spec1995Data
 import urllib
 
 f = open("./test2000.html")
