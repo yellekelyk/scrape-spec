@@ -14,6 +14,45 @@ proc.nacol <- function(df, colnames,str,num=FALSE,fill=NA) {
 }
 
 
+# return a list of data frames (1 for each unique family) 
+proc.family <- function(proc,
+                        cols=c("Family",
+                                "Feature.Size",
+                                "hw_nthreadspercore",
+                                "hw_ncoresperchip",
+                                "L2..available.per.core.",
+                                "L3",
+                                "Die.size",
+                                "Vdd_high")) {
+
+  aggCols <- paste(proc[[cols[[1]]]], proc[[cols[[2]]]], sep="::")
+  for (i in 3:length(cols)) {
+    aggCols <- paste(aggCols, proc[[cols[[i]]]], sep="::")
+  }
+  
+  proc[["agg"]] <- aggCols
+  
+  a <- tapply(1:dim(proc)[1], proc[["agg"]], function(idx) {
+    df <- proc[idx,colnames(proc)[-dim(proc)[2]]]
+    invisible(df)
+  })
+
+  invisible(a);
+}
+
+
+# give this the output of proc.family, produce a df of the best proc
+proc.best <- function(procList, clk="Clock..Mhz.") {
+
+  do.call('rbind', lapply(1:length(procList), function(idx) {
+    df <- procList[[idx]];
+    df2 <- data.frame(df[df[[clk]] == max(df[[clk]]),])
+    invisible(df2)
+  }))
+}
+
+
+
 # do regression
 proc.lm <- function(df, lhs, rhs) {
 
