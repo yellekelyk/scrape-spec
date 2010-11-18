@@ -1,8 +1,10 @@
 from odict import OrderedDict
+import SpecDataElem
 
 class SpecDataBase:
     "A Base class for parsing Spec tables"
-    def __init__(self, soup):
+    def __init__(self, soup, elem=SpecDataElem):
+        self.__elem = elem
         tabs = self.htmlTables(soup)
         self.__tables = OrderedDict()
         for tab in tabs:
@@ -11,6 +13,9 @@ class SpecDataBase:
                 self.__tables[table.name()] = table
             else:
                 raise Exception("Table " + table.name() + " duplicated!")
+
+    def getElem(self):
+        return self.__elem
 
     def htmlTables(self, soup):
         raise Exception("htmlTables() must be redefined!")

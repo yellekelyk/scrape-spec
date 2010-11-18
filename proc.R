@@ -1,3 +1,19 @@
+
+#parse the cache description and convert the cache number to per-core
+proc.cachepercore <- function(df, cache, cachedesc, newcol=NA) {
+  if (is.na(newcol)) {
+    newcol <- cache;
+  }
+  
+  tmp <- df[[cache]];
+  cols <- grep("[0-9]+\\s*MB\\s*shared", df[[cachedesc]])
+  desc <- df[[cachedesc]][cols];
+  tmp[cols] <- as.numeric(gsub(".*([0-9]+)\\s*MB.*", "\\1", desc)) * 1024; 
+  df[[newcol]] <- tmp;
+  invisible(df);
+}
+
+
 #convert strange values to NA, coerce to number if desired
 proc.nacol <- function(df, colnames,str,num=FALSE,fill=NA) {
   for (j in 1:length(colnames)) {
@@ -13,20 +29,40 @@ proc.nacol <- function(df, colnames,str,num=FALSE,fill=NA) {
   invisible(df);
 }
 
+proc.groups <- function(proc,
+                        cols=c("Family",
+                          "Feature.Size",
+                          "L2..available.per.core.",
+                          "L3",
+                          "Vdd_high",
+                          "Clock..Mhz.")) {
 
-# return a list of data frames (1 for each unique family) 
+  fam <- proc.family(proc, cols=cols);
+  fam.n <- lapply(1:length(fam), function(idx) {invisible(dim(fam[[idx]])[1])});
+  rrr <- fam[fam.n > 1];
+  group <- do.call('rbind', lapply(1:length(rrr),
+                                   function(idx) {df <- rrr[[idx]];
+                                                  rrr[["Group"]] <- idx;
+                                                  invisible(rrr);}))
+  group <- group[,c("Group", colnames(group)[-length(colnames(group))])];
+  
+  invisible(group)
+}
+
+
+# return a list of data frames (1 for each unique family)
+# this can be helpful for doing intra-family comparisons
 proc.family <- function(proc,
                         cols=c("Family",
-                                "Feature.Size",
-                                "hw_nthreadspercore",
-                                "hw_ncoresperchip",
-                                "L2..available.per.core.",
-                                "L3",
-                                "Die.size",
-                                "Vdd_high")) {
+                               "Feature.Size",
+                               "L2..available.per.core.",
+                               "L3",
+                               "Vdd_low",
+                               "Vdd_high")) {
 
-  aggCols <- paste(proc[[cols[[1]]]], proc[[cols[[2]]]], sep="::")
-  for (i in 3:length(cols)) {
+  #aggCols <- paste(proc[[cols[[1]]]], proc[[cols[[2]]]], sep="::")
+  aggCols <- c()
+  for (i in 1:length(cols)) {
     aggCols <- paste(aggCols, proc[[cols[[i]]]], sep="::")
   }
   
@@ -42,28 +78,79 @@ proc.family <- function(proc,
 
 
 # give this the output of proc.family, produce a df of the best proc
-proc.best <- function(procList, clk="Clock..Mhz.") {
+# this ensures there is just one point for each design to avoid over-weighting
+# particular famililes in the regression
+proc.best <- function(procList, metric="Clock..Mhz.") {
 
   do.call('rbind', lapply(1:length(procList), function(idx) {
     df <- procList[[idx]];
-    df2 <- data.frame(df[df[[clk]] == max(df[[clk]]),])
+    df2 <- data.frame(df[df[[metric]] == max(df[[metric]]),])
+    invisible(df2)
+  }))
+}
+
+proc.mean <- function(procList, metric="Clock..Mhz.") {
+
+  do.call('rbind', lapply(1:length(procList), function(idx) {
+    df <- procList[[idx]];
+    df2 <- data.frame(df[df[[metric]] == max(df[[metric]]),])
+    df2[[metric]] <- mean(df[[metric]], na.rm=TRUE)
+    invisible(df2)
+  }))
+}
+
+proc.worst <- function(procList, metric="Clock..Mhz.") {
+
+  do.call('rbind', lapply(1:length(procList), function(idx) {
+    df <- procList[[idx]];
+    df2 <- data.frame(df[df[[metric]] == min(df[[metric]]),])
     invisible(df2)
   }))
 }
 
 
-
 # do regression
 proc.lm <- function(df, lhs, rhs) {
-
   #filter out all NaNs, Infs
-  df <- df[is.finite(df[[lhs]]),];
+#  for (i in 1:length(lhs)) {
+#    df <- df[is.finite(df[[lhs[[i]]]]),];
+#  }
+#  for (i in 1:length(rhs)) {
+#    df <- df[is.finite(df[[rhs[[i]]]]),]
+#  }
+  regs <- lapply(1:length(lhs), function(idx) {
+    regStr <- paste(lhs[[idx]], paste(rhs, collapse="+"), sep="~");
+    invisible(lm(regStr, df));
+  })
+  invisible(regs);
+}
 
-  for (i in 1:length(rhs)) {
-    df <- df[is.finite(df[[rhs[[i]]]]),]
+
+proc.lm.plot <- function(regs, lhs, rhs, save=FALSE) {
+
+  for (j in 1:length(rhs)) {
+    df <- data.frame(1:length(regs));
+    se <- data.frame(1:length(regs));
+    for (i in 1:length(regs)) {
+      df[i,1] <- summary(regs[[i]])$coefficients[j+1,1]
+      se[i,1] <- summary(regs[[i]])$coefficients[j+1,2]
+    }
+    if (save) {
+      pdf(paste("/tmp/", rhs[[j]], sep=""))
+    }
+    else {
+    x11()
   }
-  regStr <- paste(lhs, paste(rhs, collapse="+"), sep="~");
-  invisible(lm(regStr, df));
+    
+    ci.l <- as.matrix(df)-as.matrix(se)
+    ci.h <- as.matrix(df)+as.matrix(se)
+    xvals <- barplot(as.matrix(df), beside=TRUE, ylab=rhs[[j]], names.arg=lhs, ylim=c(0, max(ci.h)), main=rhs[[j]])
+    arrows(xvals, as.matrix(df), xvals, as.matrix(df)+as.matrix(se), angle=90)
+    arrows(xvals, as.matrix(df), xvals, as.matrix(df)-as.matrix(se), angle=90)
+    if (save) {
+      dev.off()
+    }
+  }
 }
 
 

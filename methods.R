@@ -57,12 +57,12 @@ proc[proc[["Name"]] == "Intel", "intel"] <- 1
 proc[["logPipelining"]] <- log2(proc[["pipelining"]])
 
 proc2 <- proc.best(proc.family(proc))
-proc.new <- proc[as.POSIXct(proc[["Date"]]) > as.POSIXct("2003-01-01"),]
-proc.old <- proc[as.POSIXct(proc[["Date"]]) <= as.POSIXct("2003-01-01") &
+proc.new <- proc[as.POSIXct(proc[["Date"]]) > as.POSIXct("2005-01-01"),]
+proc.old <- proc[as.POSIXct(proc[["Date"]]) <= as.POSIXct("2005-01-01") &
                  as.POSIXct(proc[["Date"]]) >  as.POSIXct("1990-01-01"),]
 
-proc.new2 <- proc2[as.POSIXct(proc2[["Date"]]) > as.POSIXct("2003-01-01"),]
-proc.old2 <- proc2[as.POSIXct(proc2[["Date"]]) <= as.POSIXct("2003-01-01") &
+proc.new2 <- proc2[as.POSIXct(proc2[["Date"]]) > as.POSIXct("2005-01-01"),]
+proc.old2 <- proc2[as.POSIXct(proc2[["Date"]]) <= as.POSIXct("2005-01-01") &
                  as.POSIXct(proc2[["Date"]]) >  as.POSIXct("1990-01-01"),]
 
 lhs <- c("logSpec");
@@ -71,4 +71,7 @@ candids <- c("logClk", "logFeature", "logPipelining", "logCores", "logL1", "logL
 rhs.old <- c("logFeature", "logPipelining")
 rhs.new <- c("logFeature", "logPipelining", "threading", "logCores", "logTotalC")
 
+reg.new <- proc.lm(proc.new2, lhs, rhs.new)
+
+summary(reg.new)
 
