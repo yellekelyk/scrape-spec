@@ -9,7 +9,7 @@ class SpecMachine:
         self.__clock = "NA"
 
         # we compile this once here for efficiency
-        self.__reClkStr = re.compile("\d+\.?\d*\s*[MmGg][Hh][Zz]")
+        self.__reClkStr = re.compile("(\d+\.?\d*)\s*([MmGg][Hh][Zz])")
 
         fullTokens = list()
 
@@ -77,7 +77,10 @@ class SpecMachine:
         if not self.__isClockSet__():
             match = self.__reClkStr.search(token)
             if match:
-                self.__clock = token
+                #self.__clock = token
+                self.__clock = int(match.group(1).strip())
+                if match.group(2).lower() == "ghz":
+                    self.__clock *= 1000
                 #self.__clock = match.group(1).strip()
                 ret = True
         return ret

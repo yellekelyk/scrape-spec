@@ -2,6 +2,7 @@ from TableEntry import *
 from odict import OrderedDict
 import re
 import SpecMachine
+import SpecProcessor
 import SpecDataCores
 import SpecL1Cache
 import SpecL2Cache
@@ -12,19 +13,17 @@ class SpecDataElem(TableEntry):
     def __init__(self, attrs=None, tests=None):
         if attrs == None:
             attrs = OrderedDict()
-            attrs["hw_avail"] = 0
-            attrs["test_sponsor"] = 0
-            attrs["hw_model"] = 0
-            attrs["processor"] = 0
+            attrs["manufacturer"] = "NA"
+            attrs["family"] = "NA"
+            attrs["model"] = "NA"
+            #attrs["model_default"] = "NA"
             attrs["processor_description"] = "NA"
             attrs["clock"] = "NA"
+            attrs["bus"] = "NA"
             attrs["hw_nthreadspercore"] = 0
             attrs["hw_ncoresperchip"] = 0 
             attrs["hw_nchips"] = 0 
             attrs["hw_ncores"] = 0
-            attrs["sw_auto_parallel"] = "NA"
-            attrs["basemean"] = 0
-            attrs["peakmean"] = 0
             attrs["L1I"] = 0
             attrs["L1D"] = 0
             attrs["L1_description"] = "NA"
@@ -32,34 +31,38 @@ class SpecDataElem(TableEntry):
             attrs["L2_description"] = "NA"
             attrs["L3"] = 0
             attrs["L3_description"] = "NA"
-            attrs["link"] = "NA"
-            #attrs["results"] = Table.Table()
+            attrs["hw_avail"] = 0
+            attrs["test_sponsor"] = 0
+            attrs["hw_model"] = 0
+            attrs["sw_auto_parallel"] = "NA"
+            attrs["basemean"] = 0
+            attrs["peakmean"] = 0
             if tests != None:
                 for test in tests:
                     attrs[test] = 0
-                    #for bp in ["base", "peak"]:
-                    #attrs[str(test + "." + bp)] = 0
+            attrs["link"] = "NA"
 
         TableEntry.__init__(self, attrs)
 
 
     def update(self, attr, data):
         if attr == "hw_model":
-            m = SpecMachine.SpecMachine(data)
-            TableEntry.update(self, "clock", m.clock())
-            TableEntry.update(self, "processor", m.proc())
-            TableEntry.update(self, "hw_model", m.hw())
+            #m = SpecMachine.SpecMachine(data)
+            #TableEntry.update(self, "clock", m.clock())
+            #TableEntry.update(self, "processor", m.proc())
+            #TableEntry.update(self, "hw_model", m.hw())
+            TableEntry.update(self, attr, data)
             print data
-
-        #elif attr == "hw_nthreadspercore":
-        #    c = SpecDataCores.SpecDataCores(data)
-        #    TableEntry.update(self, "hw_nthreadspercore", c.thrdsPerCore())
-        #    TableEntry.update(self, "hw_ncoresperchip",   c.coresPerChip())
-        #    TableEntry.update(self, "hw_nchips",    c.chipsTotal())
-        #    TableEntry.update(self, "hw_ncores", c.coresTotal())
-
         elif attr == "CPU Name:" or attr == "CPU:":
-            TableEntry.update(self, "processor", data, allowDup=True)
+            p = SpecProcessor.SpecProcessor(data)
+            TableEntry.update(self, "manufacturer", p.make())
+            TableEntry.update(self, "family", p.family())
+            TableEntry.update(self, "model", p.model())
+            #TableEntry.update(self, "model_default", 
+            #                  p.family() + ":" + p.clk())
+            TableEntry.update(self, "processor_description", p.misc())
+            TableEntry.update(self, "bus", p.bus())
+            TableEntry.update(self, "clock", p.clk())
         elif attr == "CPU Characteristics:":
             TableEntry.update(self, "processor_description", data)
         elif attr == "CPU MHz:":

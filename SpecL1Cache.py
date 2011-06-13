@@ -1,3 +1,4 @@
+import pdb
 import re
 from SpecCache import *
 
@@ -7,6 +8,10 @@ class SpecL1Cache(SpecCache):
         self.__sizeI  = "NA"
         self.__sizeD  = "NA"
         
+        # remove all parentheses before parsing
+        string = string.replace('(','')
+        string = string.replace(')','')
+
         SpecCache.__init__(self, string)
 
         for match in self.matches():

@@ -1,6 +1,7 @@
 from SpecDataBase import *
 import SpecDataElem
 import Table
+import utils
 from odict import OrderedDict
 import re
 import pdb
@@ -37,6 +38,8 @@ class Spec2000Data(SpecDataBase):
         #loop through all lines in table 
         line = tab.findNext("tr").findNext("tr")
 
+        linecnt = 0
+
         #pdb.set_trace()
         while line:
             saveData = self.getElem()()
@@ -70,6 +73,11 @@ class Spec2000Data(SpecDataBase):
 
             # go to next line
             line = line.findNext("tr")
+
+            linecnt += 1
+
+            #if linecnt > 10:
+            #    return table
         
         return table
 
@@ -140,8 +148,8 @@ class Spec2000Data(SpecDataBase):
             #loop through all lines in table 
             while line:
                 if line.td:
-                    attr = str(line.th.text)
-                    data = str(line.td.text)
+                    attr = str(filter(utils.onlyascii,line.th.text))
+                    data = str(filter(utils.onlyascii,line.td.text))
                     saveData.update(attr,data) 
 
                 # go to next line

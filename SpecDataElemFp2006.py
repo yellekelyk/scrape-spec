@@ -1,6 +1,6 @@
 from SpecDataElem import *
 
-class SpecDataElemFp(SpecDataElem):
+class SpecDataElemFp2006(SpecDataElem):
     "A class that holds spec fp data for a given processor"
 
     def __init__(self):

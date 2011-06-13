@@ -5,11 +5,8 @@ import Spec1995Data
 import SpecDataElem
 import urllib
 import sys
+import utils
 import pdb
-
-def onlyascii(char):
-    if ord(char) > 127: return""
-    else: return char
 
 def main():
 
@@ -19,7 +16,7 @@ def main():
 
 
     html = urllib.urlopen(sys.argv[1]).read()
-    html = filter(onlyascii, html)
+    html = filter(utils.onlyascii, html)
 
     #f = open("./test.cint2000.html")
     #html = f.read()
@@ -31,6 +28,7 @@ def main():
 
     mod  = __import__(sys.argv[2])
     data = mod.__dict__.get(mod.__name__)(soup, elem=elem)
+
     for name in data.getNames():
         f = open(str("./test."+ name.replace(" ", "_").replace(":","") + ".csv"), 
              'w')
