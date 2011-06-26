@@ -45,7 +45,7 @@ class SpecDataElem(TableEntry):
         TableEntry.__init__(self, attrs)
 
 
-    def update(self, attr, data):
+    def update(self, attr, data, allowDup=False):
         if attr == "hw_model":
             #m = SpecMachine.SpecMachine(data)
             #TableEntry.update(self, "clock", m.clock())
@@ -87,5 +87,5 @@ class SpecDataElem(TableEntry):
         #    print str("DEBUG-unknown attr " + attr)
 
         else:
-            TableEntry.update(self, attr, data)
+            TableEntry.update(self, attr, data, allowDup)
 

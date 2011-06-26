@@ -29,7 +29,7 @@ class TableEntry:
         #raise Exception(str("Bad attribute:" + attr))
 
     def get(self, attr):
-        if attr not in self.__attrs:
+        if attr not in self.attrs():
             raise Exception(str("Bad attribute:" + attr))
         return self.__data[attr]
 

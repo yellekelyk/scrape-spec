@@ -91,7 +91,7 @@ class SpecProcessor:
                                        "R4400",
                                        "R3000",
                                        "R2000"],
-                             "Ross" : ["HyperSPARC"],
+                             "Ross" : ["hyperSPARC"],
                              "Sun" : ["SuperSPARC II",
                                       "SuperSPARC", 
                                       "UltraSPARC III",
