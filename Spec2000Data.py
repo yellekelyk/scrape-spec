@@ -2,7 +2,7 @@ from SpecDataBase import *
 import SpecDataElem
 import Table
 import utils
-from odict import OrderedDict
+from ordereddict import OrderedDict
 import re
 import pdb
 import urllib

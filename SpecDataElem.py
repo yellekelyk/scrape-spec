@@ -1,5 +1,5 @@
 from TableEntry import *
-from odict import OrderedDict
+from ordereddict import OrderedDict
 import re
 import SpecMachine
 import SpecProcessor

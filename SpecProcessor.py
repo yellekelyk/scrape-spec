@@ -1,6 +1,6 @@
 import re
 import pdb
-from odict import OrderedDict
+from ordereddict import OrderedDict
 
 class SpecProcessor:
     "A class to aid in parsing spec processors, which can be in a number of forms"

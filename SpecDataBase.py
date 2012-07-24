@@ -1,4 +1,4 @@
-from odict import OrderedDict
+from ordereddict import OrderedDict
 import SpecDataElem
 
 class SpecDataBase:

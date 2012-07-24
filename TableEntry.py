@@ -1,4 +1,4 @@
-from odict import OrderedDict
+from ordereddict import OrderedDict
 
 class TableEntry:
     "A generic class that holds table-based data"

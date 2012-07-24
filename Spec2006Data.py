@@ -1,7 +1,7 @@
 from SpecDataBase import *
 import SpecDataElem
 import Table
-from odict import OrderedDict
+from ordereddict import OrderedDict
 import pdb
 import urllib
 import BeautifulSoup
