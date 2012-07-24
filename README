@@ -1,0 +1,48 @@
+A scraper for tables on SPEC website. Attempts to parse various processor descriptions into more meaningful fields.  It generally does a good job, but still requires some manual cleanup.  To use it, do something like
+
+$ python scrapeSpec.py <URL> <PARSELIB> <TEST>
+
+The arguments following scrapeSpec.py are defined in more detail below.
+
+When the script finishes, it will write a CSV file (the name depends on the arguments ... see scrapeSpec.py for details).
+
+If the arguments are not consistent, the script is likely to error out, or provide incomplete results. It should be possible to write a wrapper that makes using this script convenient, since many of the args depend on each other. For example, something that accepts "--year=1992 --type=int" implies the following arguments:
+http://performance.netlib.org/performance/html/new.spec.cint92.col0.html Spec1992Data SpecDataElemInt1992
+
+Argument Descriptions:
+
+<URL>: path to the results on the SPEC website. The list of current URLs is
+
+SPEC1992
+http://performance.netlib.org/performance/html/new.spec.cint92.col0.html
+http://performance.netlib.org/performance/html/new.spec.cfp92.col0.html
+
+SPEC1995
+http://www.spec.org/cpu95/results/cint95.html
+http://www.spec.org/cpu95/results/cfp95.html
+
+SPEC2000
+http://www.spec.org/cpu2000/results/cint2000.html
+http://www.spec.org/cpu2000/results/cfp2000.html
+
+SPEC2006
+http://www.spec.org/cpu2006/results/cint2006.html
+http://www.spec.org/cpu2006/results/cfp2006.html
+
+<PARSELIB> A class that parses the HTML tables. Each URL will only work with one class
+The list of current parsing classes are:
+Spec1992Data
+Spec1995Data
+Spec2000Data
+Spec2006Data
+
+<TEST> A class that defines the information about the tests (usually just names). Again, each URL will only work with one of these classes. The list of classes are
+SpecDataElemInt1992
+SpecDataElemInt1995
+SpecDataElemInt2000
+SpecDataElemInt2006
+SpecDataElemFp1992
+SpecDataElemFp1995
+SpecDataElemFp2000
+SpecDataElemFp2006
+
